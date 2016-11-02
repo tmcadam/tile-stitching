@@ -1,9 +1,11 @@
+import json
 import math
 import random
 import os
 import subprocess
 import sys
 import errno
+from StringIO import StringIO
 from string import Template
 
 import eventlet
@@ -13,12 +15,13 @@ from PIL import Image
 
 class Provider:
 
-    def __init__(self, name, tile_system, tile_format, url, balancers=None):
+    def __init__(self, name, tile_system, tile_format, url, attribution, balancers=None):
 
         self.name = name
         self.tile_system = tile_system
         self.tile_format = tile_format
         self.url = url
+        self.attribution = attribution
         self.balancers = balancers
 
     def gen_url(self, tile):
@@ -94,11 +97,11 @@ class Tile:
     def url(self, provider):
         return provider.gen_url(self)
 
-    def path(self, provider):
-        return os.path.join(str(self.z), str(self.x), '{}.{}'.format(self.y, provider.tile_format.lower()))
+    def path(self):
+        return os.path.join(str(self.z), str(self.x), '{}.png'.format(self.y))
 
     def full_path(self, tile_job):
-        return os.path.join(tile_job.out_path, tile_job.job_name, self.path(tile_job.tileset.provider))
+        return os.path.join(tile_job.out_path, tile_job.job_name, self.path())
 
     def identifier(self, provider):
         identifier = provider.name.lower() + '_' + str(self.z) + '_'
@@ -106,11 +109,15 @@ class Tile:
         return identifier
 
 
-
 class TileSet:
 
-    def __init__(self, north, south, west, east, zoom_min, zoom_max, provider):
+    def __init__(self, name, version, description, folder, extents, zoom_min, zoom_max, provider):
 
+        self.name = name
+        self.version = version
+        self.description = description
+        self.folder = folder
+        north, south, west, east = extents
         self.bbox = {
             "n": self.check_north(north),
             "e": east,
@@ -181,11 +188,11 @@ class TileSet:
 
 class TileDownloadJob:
 
-    def __init__(self, out_path, job_name, tileset):
+    def __init__(self, out_path, tileset):
 
         self.counts = dict()
         self.out_path = out_path
-        self.job_name = job_name
+        self.job_name = tileset.folder
         self.tileset = tileset
         self.downloads = list()
         self.exists = list()
@@ -218,21 +225,27 @@ class TileDownloadJob:
                     if exc.errno != errno.EEXIST:
                         raise
 
+        # def set_proxy():
+        #     proxy = urllib2.ProxyHandler({'http': '88.208.238.203:3128'})
+        #     opener = urllib2.build_opener(proxy)
+        #     urllib2.install_opener(opener)
+
         def fetch(tile):
             try:
                 tile.image = urllib2.urlopen(tile.url(self.tileset.provider)).read()
-            except urllib2.HTTPError:
+            except:
                 with open("blank.png", 'rb') as f:
                     tile.image = f.read()
             finally:
                 return tile
 
+        #set_proxy()
         pool = eventlet.GreenPool(10)
         for tile in pool.imap(fetch, self.downloads):
             filename = tile.full_path(self)
             test_path(filename)
-            with open(filename, 'wb') as f:
-                f.write(tile.image)
+            im = Image.open(StringIO(tile.image))
+            im.save(filename, "PNG")
             tile.image = None
             self.exists.append(tile)
             output = "Downloaded: {}/{}".format(len(self.exists)-self.counts["exists"], self.counts["download"])
@@ -243,9 +256,8 @@ class TileDownloadJob:
 
         with open('viewer.html', 'r') as template_file:
             viewer = MyTemplate(unicode(template_file.read()))
-            tiles_dir = '%s/%s' % (self.out_path, self.job_name)
             use_tms = 'false'
-            substitutions = {'tilesdir': tiles_dir,
+            substitutions = {'tilesdir': self.tiles_dir(),
                              'tilesext': 'png',
                              'tilesetname': self.job_name,
                              'tms': use_tms,
@@ -254,9 +266,30 @@ class TileDownloadJob:
                              'avgzoom': self.tileset.avg_zoom(),
                              'maxzoom': self.tileset.zoom_max
                              }
-            file_path = '%s/%s.html' % (self.out_path, self.job_name)
+            file_path = os.path.join(self.out_path, '{}.html'.format(self.job_name))
             with open(file_path, 'w') as fOut:
                 fOut.write(viewer.substitute(substitutions))
+
+    def tiles_dir(self):
+        return os.path.join(self.out_path, self.job_name)
+
+    def write_metadata(self):
+        metadata = MetaData(self.tileset)
+        metadata.write(self.tiles_dir())
+
+    def write_mbtiles(self):
+        self.write_metadata()
+        args = [
+            'mb-util',
+            self.tiles_dir(),
+            os.path.join(self.out_path, '{}.mbtiles'.format(self.job_name)),
+            '--scheme',
+            'xyz' if self.tileset.provider.tile_system == "SLIPPY" else 'tms',
+            '--image_format',
+            'png'
+        ]
+        subprocess.call(args)
+
 
 class TileStitchJob:
 
@@ -336,5 +369,24 @@ class MyTemplate(Template):
 
     def __init__(self, template_string):
         Template.__init__(self, template_string)
+
+
+class MetaData:
+
+    def __init__(self, tileset):
+
+        self.META_DATA = dict()
+        self.META_DATA['name'] = tileset.name
+        self.META_DATA['type'] = 'baselayer'
+        self.META_DATA['version'] = tileset.version
+        self.META_DATA['description'] = tileset.description
+        self.META_DATA['format'] = 'png'
+        self.META_DATA['bounds'] = '{},{},{},{}'.format(tileset.bbox['w'], tileset.bbox['s'], tileset.bbox['e'], tileset.bbox['n'])
+        self.META_DATA['attribution'] = tileset.provider.attribution
+
+    def write(self, file_path):
+        with open(os.path.join(file_path, 'metadata.json'), 'w') as fp:
+            json.dump(self.META_DATA, fp)
+
 
 

@@ -228,27 +228,48 @@ class TileDownloadJob:
         # def set_proxy():
         #     proxy = urllib2.ProxyHandler({'http': '88.208.238.203:3128'})
         #     opener = urllib2.build_opener(proxy)
-        #     urllib2.install_opener(opener)
+        #     urllib2.install_opener(opener)a
 
         def fetch(tile):
             try:
+                self.counts['attempted'] += 1
                 tile.image = urllib2.urlopen(tile.url(self.tileset.provider)).read()
-            except:
-                with open("blank.png", 'rb') as f:
-                    tile.image = f.read()
+                self.counts['found'] += 1
+            except urllib2.HTTPError as e:
+                if e.code == 403:
+                    self.counts['blocked'] += 1
+                elif e.code == 404:
+                    self.counts['not_found'] += 1
+                    with open("blank.png", 'rb') as f:
+                        tile.image = f.read()
+                else:
+                    print e.code
+            except urllib2.URLError as e:
+                print e
             finally:
                 return tile
+
+        self.counts['blocked'] = 0
+        self.counts['not_found'] = 0
+        self.counts['found'] = 0
+        self.counts['attempted'] = 0
 
         #set_proxy()
         pool = eventlet.GreenPool(10)
         for tile in pool.imap(fetch, self.downloads):
             filename = tile.full_path(self)
             test_path(filename)
-            im = Image.open(StringIO(tile.image))
-            im.save(filename, "PNG")
-            tile.image = None
-            self.exists.append(tile)
-            output = "Downloaded: {}/{}".format(len(self.exists)-self.counts["exists"], self.counts["download"])
+            if tile.image:
+                im = Image.open(StringIO(tile.image))
+                im.save(filename, "PNG")
+                tile.image = None
+                self.exists.append(tile)
+            output = "Attempted: {0}/{1}   Found: {2}   Not found: {3}   Blocked: {4}".format(
+                                                                        self.counts["attempted"],
+                                                                        self.counts["download"],
+                                                                        self.counts["found"],
+                                                                        self.counts['not_found'],
+                                                                        self.counts['blocked'])
             sys.stdout.write("\r{}".format(output))
             sys.stdout.flush()
 

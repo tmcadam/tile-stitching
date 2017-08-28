@@ -262,7 +262,6 @@ class TileDownloadJob:
         self.counts['found'] = 0
         self.counts['attempted'] = 0
 
-        #set_proxy()
         pool = eventlet.GreenPool(10)
         for tile in pool.imap(fetch, self.downloads):
             filename = tile.full_path(self)

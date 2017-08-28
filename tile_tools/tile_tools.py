@@ -306,11 +306,16 @@ class TileDownloadJob:
         metadata.write(self.tiles_dir())
 
     def write_mbtiles(self):
+        filename = os.path.join(self.out_path, '{}.mbtiles'.format(self.job_name))
         self.write_metadata()
+        try:
+            os.remove(filename)
+        except OSError as e:
+            pass
         args = [
             'mb-util',
             self.tiles_dir(),
-            os.path.join(self.out_path, '{}.mbtiles'.format(self.job_name)),
+            filename,
             '--scheme',
             'xyz' if self.tileset.provider.tile_system == "SLIPPY" else 'tms',
             '--image_format',
@@ -321,7 +326,7 @@ class TileDownloadJob:
 
     def clean_download(self):
         args = ["find",
-                os.path.join(self.tiles_dir()),
+                self.tiles_dir(),
                 "-type",
                 "f",
                 "-not",
@@ -340,11 +345,11 @@ class TileDownloadJob:
 
 class TileStitchJob:
 
-    def __init__(self, tile_download_job, zoom):
+    def __init__(self, tile_download_job):
         self.job = tile_download_job
         self.tileset = tile_download_job.tileset
         self.path = os.path.join(self.job.out_path, self.job.job_name)
-        self.zoom = zoom
+        self.zoom = self.tileset.zoom_max
         self.px = 256 * len(self.tileset.cols(self.zoom))
         self.py = 256 * len(self.tileset.rows(self.zoom))
 
@@ -376,21 +381,17 @@ class TileStitchJob:
             sys.stdout.write("\r{}".format(output))
             sys.stdout.flush()
 
+        # this should overwrite if it already exists
         image.save(self.path + '.png')
         with open(self.path + '.pngw', 'w') as f:
             f.writelines(self.gen_world())
 
     def convert_tif(self):
-        print 'Converting......'
-        # try:
-        #     os.remove(mappath.replace('.png', '.tif'))
-        # except:
-        #     pass
-        # try:
-        #     os.remove(mappath.replace('.png', '.tif.ovr'))
-        # except:
-        #     pass
-
+        print '\nConverting to GeoTiff......'
+        try:
+            os.remove(self.path + ".tif")
+        except OSError as e:
+            pass
         args = ['gdal_translate', '-co', 'COMPRESS=JPEG', '-co', 'PHOTOMETRIC=RGB', '-co', 'BIGTIFF=YES', '-co', 'ALPHA=YES',
                 '-co', 'INTERLEAVE=BAND', '-co', 'JPEG_QUALITY=75', '-co', 'TFW=NO', self.path + ".png", self.path + ".tif"]
         subprocess.call(args)
@@ -398,17 +399,27 @@ class TileStitchJob:
         args = ['gdal_edit.py', '-a_srs', 'EPSG:3857', self.path + ".tif"]
         subprocess.call(args)
 
-        # cmd = 'gdaladdo -ro ' \
-        #       '-r average ' \
-        #       '--config COMPRESS_OVERVIEW JPEG ' \
-        #       '--config JPEG_QUALITY_OVERVIEW 75 ' \
-        #       '--config BIGTIFF_OVERVIEW YES %s 2 4 8 16 32 64 128 256' % (mappath.replace('.png', '.tif'))
-        # os.system(cmd)
-        # # os.remove(mappath)
-        # # os.remove(mappath.replace('.png', '.pngw'))
+        # Add overviews to give better rendering performance in GIS
+        print '\nAdding overviews......'
+        try:
+            os.remove(self.path + ".tif.ovr")
+        except OSError as e:
+            pass
+        args = ['gdaladdo',
+                '-ro',
+                '-r', 'average',
+                '--config', 'COMPRESS_OVERVIEW', 'JPEG',
+                '--config', 'JPEG_QUALITY_OVERVIEW', '75',
+                '--config', 'BIGTIFF_OVERVIEW', 'YES',
+                self.path + ".tif",
+                '2', '4', '8', '16', '32', '64', '128', '256']
+        subprocess.call(args)
+
+        # clean up the PNGs they are big and slow
+        os.remove(self.path + ".png")
+        os.remove(self.path + ".pngw")
 
         print 'Saved stitched map '
-        print 'Finished.'
 
 
 class MyTemplate(Template):

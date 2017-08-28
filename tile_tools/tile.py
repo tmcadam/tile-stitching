@@ -23,12 +23,15 @@ elif sys.argv[2] == "create_viewer":
     t.write_leaflet_viewer()
 elif sys.argv[2] == "mbtiles":
     t.write_mbtiles()
+elif sys.argv[2] == "geotiff":
+    sys.stdout.write("Creating GeoTiff....\n")
+    ## This is used to create a geotiff, mainly for ArcMap users.
+    s = tile_tools.TileStitchJob(t)
+    s.stitch()
+    s.convert_tif()
 else:
     print("ERROR: Command not found\n")
 
 sys.stdout.write("\n##### Finished ####\n\n")
 
-## This is used to create a geotiff, mainly for ArcMap users.
-# s = TileStitchJob(t, 16)
-# s.stitch()
-# s.convert_tif()
+

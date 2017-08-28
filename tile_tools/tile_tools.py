@@ -314,7 +314,8 @@ class TileDownloadJob:
             '--scheme',
             'xyz' if self.tileset.provider.tile_system == "SLIPPY" else 'tms',
             '--image_format',
-            'png'
+            'png',
+            '--silent'
         ]
         subprocess.call(args)
 

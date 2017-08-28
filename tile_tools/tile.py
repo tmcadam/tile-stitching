@@ -22,7 +22,6 @@ elif sys.argv[2] == "create_viewer":
     sys.stdout.write("Creating html viewer....")
     t.write_leaflet_viewer()
 elif sys.argv[2] == "mbtiles":
-    sys.stdout.write("Converting to MBTiles format....")
     t.write_mbtiles()
 else:
     print("ERROR: Command not found\n")

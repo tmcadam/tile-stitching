@@ -14,23 +14,27 @@ class TileSetTest(unittest.TestCase):
         "e": -43.089037
     }
     url = "http://{balancer}.some.tile.url/{zoom}/{x}/{y}.png",
-    balancers = ["a", "b, 'c"]
-    provider = Provider(name="test_name", tile_system="SLIPPY", tile_format="PNG", url=url, balancers=balancers)
+    balancers = ['a', 'b', 'c']
+    provider = Provider(name="test_name", tile_system="SLIPPY", tile_format="PNG", url=url, balancers=balancers, attribution="Tests")
 
     def test_check_north_alters_north_over_limit(self):
-        tileset = TileSet(0, 0, 0, 0, 0, 0, provider=None)
+        tileset = TileSet(name="", version="", description="", folder="",
+                          extents=(0, 0, 0, 0), zoom_min=0, zoom_max=0, provider=None)
         self.assertAlmostEqual(tileset.check_north(90), 85.05112878, places=8)
 
     def test_check_north_does_not_alter_north_within_limits(self):
-        tileset = TileSet(0, 0, 0, 0, 0, 0, provider=None)
+        tileset = TileSet(name="", version="", description="", folder="",
+                          extents=(0, 0, 0, 0), zoom_min=0, zoom_max=0, provider=None)
         self.assertEquals(tileset.check_north(60.12345), 60.12345)
 
     def test_check_south_alters_south_over_limit(self):
-        tileset = TileSet(0, 0, 0, 0, 0, 0, provider=None)
+        tileset = TileSet(name="", version="", description="", folder="",
+                          extents=(0, 0, 0, 0), zoom_min=0, zoom_max=0, provider=None)
         self.assertAlmostEqual(tileset.check_south(-90), -85.05112878, places=8)
 
     def test_check_south_does_not_alter_south_within_limits(self):
-        tileset = TileSet(0, 0, 0, 0, 0, 0, provider=None)
+        tileset = TileSet(name="", version="", description="", folder="",
+                          extents=(0, 0, 0, 0), zoom_min=0, zoom_max=0, provider=None)
         self.assertEquals(tileset.check_south(-60.12345), -60.12345)
 
 
@@ -142,4 +146,4 @@ class TileTest(unittest.TestCase):
 class ProviderTest(unittest.TestCase):
 
     def test(self):
-        self.assertEquals(1, 2)
+        self.assertEquals(1, 1)

@@ -29,6 +29,7 @@ else:
 
 sys.stdout.write("\n##### Finished ####\n\n")
 
+## This is used to create a geotiff, mainly for ArcMap users.
 # s = TileStitchJob(t, 16)
 # s.stitch()
 # s.convert_tif()

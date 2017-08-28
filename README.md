@@ -7,6 +7,7 @@ blocked from accessing their services. You've been warned, use at your own risk.
 For the tool itself no installation is required, just download or clone.
 
 **Installing dependencies**
+
 + Install eventlet (essential) `sudo pip install eventlet`
 + Install mb-util (needed to exported MBTiles format)
 + Install Python Imaging Library (PIL) and GDAL (needed for GeoTiff export)

@@ -7,18 +7,18 @@ blocked from accessing their services. You've been warned, use at your own risk.
 For the tool itself no installation is required, just download or clone.
 
 **Installing dependencies**
-    * Install eventlet (essential)
-    `sudo pip install eventlet`
-    * Install mb-util (needed to exported MBTiles format)
-    https://github.com/mapbox/mbutil
-    NB. Make sure to complete the step that makes mb-util avilable system-wide
-    *  Install Python Imaging Library (PIL) and GDAL (needed for GeoTiff export)
-    **Ubuntu**
-    `sudo pip install PIL`
-     http://www.sarasafavi.com/installing-gdalogr-on-ubuntu.html
-    **Windows**
-    Install PIL through OSGEO4W
-    https://www.aubrett.com/article/information-technology/geospatial/gdal/install-osgeo4w
+* Install eventlet (essential)
+`sudo pip install eventlet`
+* Install mb-util (needed to exported MBTiles format)
+https://github.com/mapbox/mbutil
+NB. Make sure to complete the step that makes mb-util avilable system-wide
+*  Install Python Imaging Library (PIL) and GDAL (needed for GeoTiff export)
+**Ubuntu**
+sudo pip install PIL`
+http://www.sarasafavi.com/installing-gdalogr-on-ubuntu.html
+**Windows**
+Install PIL through OSGEO4W
+https://www.aubrett.com/article/information-technology/geospatial/gdal/install-osgeo4w
 
 
 **Usage**

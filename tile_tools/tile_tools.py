@@ -88,7 +88,8 @@ class Tile:
     def to_rectangle_meters(self):
         return self.lonlat_to_meters(self.to_rectangle()[0]), self.lonlat_to_meters(self.to_rectangle()[1])
 
-    def lonlat_to_meters(self, lonlat):
+    @staticmethod
+    def lonlat_to_meters(lonlat):
         """
         Converts given lat/lon in WGS84 Datum to XY in Spherical Mercator EPSG:900913
         """
@@ -137,12 +138,14 @@ class TileSet:
         self.provider = provider
         self.tiles = self.pop_tileset()
 
-    def check_north(self, north):
+    @staticmethod
+    def check_north(north):
         if north > 85.05112877980659:
             return 85.05112877980659
         return north
 
-    def check_south(self, south):
+    @staticmethod
+    def check_south(south):
         if south < -85.05112877980659:
             return -85.05112877980659
         return south
@@ -176,7 +179,8 @@ class TileSet:
         bottom_right = Tile(x2, y2, zoom).to_rectangle_meters()[1]
         return top_left, bottom_right
 
-    def deg2num(self, lat_deg, lon_deg, zoom):
+    @staticmethod
+    def deg2num(lat_deg, lon_deg, zoom):
         lat_rad = math.radians(lat_deg)
         n = 2.0 ** zoom
         x_tile = int((lon_deg + 180.0) / 360.0 * n)

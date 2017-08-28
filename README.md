@@ -9,6 +9,9 @@ blocked from accessing their services. You've been warned, read the t&cs and use
 
 For the tool itself no installation is required, just download or clone.
 
++ https://bitbucket.org/tom-mcadam/tile-stitching/downloads/
++ `git clone git@bitbucket.org:tom-mcadam/tile-stitching.git`
+
 ##Installing dependencies##
 
 + Install eventlet (essential) `sudo pip install eventlet`

@@ -10,7 +10,11 @@ OUT_DIR = sys.argv[1]
 
 t = tile_tools.TileDownloadJob(OUT_DIR, tilesets.sample1)
 
-if sys.argv[2] == "download":
+if sys.argv[2] == "count_tiles":
+    print "Total tiles in area:\t", (t.counts["exists"] + t.counts["download"])
+    print "Already downloaded:\t", t.counts["exists"]
+    print "Need downloaded:\t", t.counts["download"]
+elif sys.argv[2] == "download":
     sys.stdout.write("Tiles within extents: {}\n".format(t.counts["download"] + t.counts["exists"]))
     sys.stdout.write("Tiles already downloaded: {}\n".format(t.counts["exists"]))
     sys.stdout.write("Tiles to download: {}\n\n".format(t.counts["download"]))

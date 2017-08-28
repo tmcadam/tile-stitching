@@ -2,9 +2,6 @@ import sys
 import tilesets
 import tile_tools
 
-# check for small files
-#  find .  -type f -not -size +1k -name "*.png" | wc -l
-#  find .  -type f -not -size +1k -name "*.png" -delete | wc -l
 
 sys.stdout.write("\n##### Tile Utilities ####\n\n")
 

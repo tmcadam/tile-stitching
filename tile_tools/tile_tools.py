@@ -213,8 +213,8 @@ class TileDownloadJob:
 
     def gen_download_lists(self):
 
-        def test_file(filename):
-            if os.path.exists(filename):
+        def test_file(filename_to_test):
+            if os.path.exists(filename_to_test):
                 return True
             return False
 
@@ -230,18 +230,13 @@ class TileDownloadJob:
 
     def get_tiles(self):
 
-        def test_path(filename):
-            if not os.path.exists(os.path.dirname(filename)):
+        def test_path(filename_to_check):
+            if not os.path.exists(os.path.dirname(filename_to_check)):
                 try:
-                    os.makedirs(os.path.dirname(filename))
+                    os.makedirs(os.path.dirname(filename_to_check))
                 except OSError as exc:  # Guard against race condition
                     if exc.errno != errno.EEXIST:
                         raise
-
-        # def set_proxy():
-        #     proxy = urllib2.ProxyHandler({'http': '88.208.238.203:3128'})
-        #     opener = urllib2.build_opener(proxy)
-        #     urllib2.install_opener(opener)a
 
         def fetch(tile_to_fetch):
             try:
@@ -291,14 +286,14 @@ class TileDownloadJob:
         with open('viewer.html', 'r') as template_file:
             viewer = MyTemplate(unicode(template_file.read()))
             use_tms = 'false'
-            substitutions = {'tilesdir': self.tiles_dir(),
-                             'tilesext': 'png',
-                             'tilesetname': self.job_name,
+            substitutions = {'tiles_dir': self.tiles_dir(),
+                             'tiles_ext': 'png',
+                             'tileset_name': self.job_name,
                              'tms': use_tms,
-                             'centerx': self.tileset.center_x(),
-                             'centery': self.tileset.center_y(),
-                             'avgzoom': self.tileset.avg_zoom(),
-                             'maxzoom': self.tileset.zoom_max
+                             'center_x': self.tileset.center_x(),
+                             'center_y': self.tileset.center_y(),
+                             'avg_zoom': self.tileset.avg_zoom(),
+                             'max_zoom': self.tileset.zoom_max
                              }
             file_path = os.path.join(self.out_path, '{}.html'.format(self.job_name))
             with open(file_path, 'w') as fOut:
@@ -415,12 +410,10 @@ class MetaData:
         self.META_DATA['version'] = tileset.version
         self.META_DATA['description'] = tileset.description
         self.META_DATA['format'] = 'png'
-        self.META_DATA['bounds'] = '{},{},{},{}'.format(tileset.bbox['w'], tileset.bbox['s'], tileset.bbox['e'], tileset.bbox['n'])
+        self.META_DATA['bounds'] = '{},{},{},{}'.format(
+            tileset.bbox['w'], tileset.bbox['s'], tileset.bbox['e'], tileset.bbox['n'])
         self.META_DATA['attribution'] = tileset.provider.attribution
 
     def write(self, file_path):
         with open(os.path.join(file_path, 'metadata.json'), 'w') as fp:
             json.dump(self.META_DATA, fp)
-
-
-

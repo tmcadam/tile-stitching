@@ -1,3 +1,8 @@
+#################################################################
+#   Tom McAdam                                                  #
+#   Copyright (c) 2016, Thomas McAdam. All rights reserved.     #
+#################################################################
+
 import urllib2
 from cStringIO import StringIO
 

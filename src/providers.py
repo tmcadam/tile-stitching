@@ -1,3 +1,8 @@
+#################################################################
+#   Tom McAdam                                                  #
+#   Copyright (c) 2016, Thomas McAdam. All rights reserved.     #
+#################################################################
+
 from tile_tools import Provider
 
 rio_outline = Provider(

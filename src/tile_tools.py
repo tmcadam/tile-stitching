@@ -1,3 +1,8 @@
+#################################################################
+#   Tom McAdam                                                  #
+#   Copyright (c) 2016, Thomas McAdam. All rights reserved.     #
+#################################################################
+
 import json
 import math
 import random

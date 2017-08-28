@@ -1,3 +1,8 @@
+#################################################################
+#   Tom McAdam                                                  #
+#   Copyright (c) 2016, Thomas McAdam. All rights reserved.     #
+#################################################################
+
 import sys
 import tilesets
 import tile_tools

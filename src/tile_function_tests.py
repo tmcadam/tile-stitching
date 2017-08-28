@@ -1,3 +1,8 @@
+#################################################################
+#   Tom McAdam                                                  #
+#   Copyright (c) 2016, Thomas McAdam. All rights reserved.     #
+#################################################################
+
 import unittest
 
 from tile_tools import Tile, Provider, TileSet

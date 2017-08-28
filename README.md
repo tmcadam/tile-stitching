@@ -32,8 +32,10 @@ For the tool itself no installation is required, just download or clone.
 The first step is to setup some job parameters in the file **tilesets.py**. There are some examples in there already that should give you an idea of what is needed. Bounds can be found from Google Earth/Maps etc. A provider must be selected. These are defined in **providers.py** and it is easy to add your own or update them as the details change over time.
 
 There are 5 basic command options and all take the format: 
-`python tile.py <tile-set-name> <output-folder> <command-option>`.
+`python tile.py <tileset-name> <output-folder> <command-option>`.
 The tool will create a subfolder within this folder for each individual job.
+    
+e.g. `python tile.py sample2 "/home/bob/Tiles" geotiff`    
     
 + `count_tiles` This will analyse the specified <tile-set-name> and output the number of tiles that need to be downloaded. Useful for check this is a sensible number before proceeding to download.
 + `download` This will attempt to download all the tiles in the specified <tile-set-name> into the output folder. It will output how many were successful. If a tile already exists it will be ignored, so it can safely be run again with the same paraeters if necessary. This process can take a while.

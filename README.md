@@ -1,7 +1,9 @@
-This is a set of Python tools to download tiles and convert them into an offline format compatible with QGIS or ArcMap. This isn't very user friendly and some knowledge of Python is required. 
+A set of Python tools to download tiles and convert them into an offline format compatible with QGIS or ArcMap. 
+
+It was created to help teams responding to natural disasters in the Philippines, giving them access to aerial imagery in tools like QGIS during during periods of disruption to internet services. The tool is not user friendly and some knowledge of Python is required. 
 
 NB. The use of this script may breach the terms and conditions of some web mapping services and may lead to you being 
-blocked from accessing their services. You've been warned, use at your own risk.
+blocked from accessing their services. You've been warned, read the t&cs and use at your own risk.
 
 ##Installation##
 

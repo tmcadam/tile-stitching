@@ -1,12 +1,13 @@
 This is a set of Python tools to download tiles and convert them into an offline format compatible with QGIS or ArcMap. This isn't very user friendly and some knowledge of Python is required. 
 
-**NB.** The use of this script may breach the terms and conditions of some web mapping services and may lead to you being 
+NB. The use of this script may breach the terms and conditions of some web mapping services and may lead to you being 
 blocked from accessing their services. You've been warned, use at your own risk.
 
-**Installation**
+##Installation##
+
 For the tool itself no installation is required, just download or clone.
 
-**Installing dependencies**
+##Installing dependencies##
 
 + Install eventlet (essential) `sudo pip install eventlet`
 + Install mb-util (needed to exported MBTiles format)
@@ -21,7 +22,8 @@ For the tool itself no installation is required, just download or clone.
         + https://www.aubrett.com/article/information-technology/geospatial/gdal/install-osgeo4w
 
 
-**Usage**
+##Usage##
+
 You will need to setup some job parameters before you start in the file **tilesets.py**. There are some examples in there already that should give you an idea of what is needed. Bounds can be found from Google Earth/Maps etc. You will also need to choose a provider. These are defined in **providers.py** and it is easy to add your own or update them as the details change over time.
 
 There are 5 basic command options and all take the format: 
@@ -37,11 +39,13 @@ The tool will create a subfolder within this folder for each individual job.
 
 
 
-**System resources & tile numbers**
+##System resources & tile numbers##
+
 The number of tiles can be huge. Size of area and zoom levels effect the number. Each zoom level has 4 times the number of tiles as the previous so things can get out of hand quickly! The generation of the GeoTiff will require a lot of system memory(RAM) if you are doing large areas at high zooms. Use the `count_tiles` tool.
 
 
-**Windows Users**
+##Windows Users##
+
 This hasn't been tested on Windows, but I imagine everything should run if installed in an environment like OSGEO4W.
 
 

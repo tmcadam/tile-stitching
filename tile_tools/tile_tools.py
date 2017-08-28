@@ -14,6 +14,9 @@ from PIL import Image
 
 
 class Provider:
+    """
+        This class is used to store details of a tile provider i.e. Google, Bing etc.
+    """
 
     def __init__(self, name, tile_system, tile_format, url, attribution, balancers=None):
 
@@ -32,8 +35,10 @@ class Provider:
 
 class Tile:
     """
-    Uses the Slippy/Google convention for all calculation (metatiles etc.) provides a conversion
-    to TMS if necessary.
+    A class to operate on individual tiles, convert to coordinates, swap between TMS slippy etc.
+    Some of this comes from:
+        http://www.maptiler.org/google-maps-coordinates-tile-bounds-projection/globalmaptiles.py
+        Copyright (c) 2008 Klokan Petr Pridal. All rights reserved.
     """
     def __init__(self, x=0, y=0, z=0):
         self.x = x
@@ -110,7 +115,9 @@ class Tile:
 
 
 class TileSet:
-
+    """
+    A Tileset is a geographical area and the contains a bunch of tiles
+    """
     def __init__(self, name, version, description, folder, extents, zoom_min, zoom_max, provider):
 
         self.name = name
@@ -187,7 +194,9 @@ class TileSet:
 
 
 class TileDownloadJob:
-
+    """
+    A download job manages the processing of a Tileset
+    """
     def __init__(self, out_path, tileset):
 
         self.counts = dict()

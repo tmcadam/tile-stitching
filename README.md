@@ -26,7 +26,7 @@ For the tool itself no installation is required, just download or clone.
 
 ##Usage##
 
-You will need to setup some job parameters before you start in the file **tilesets.py**. There are some examples in there already that should give you an idea of what is needed. Bounds can be found from Google Earth/Maps etc. You will also need to choose a provider. These are defined in **providers.py** and it is easy to add your own or update them as the details change over time.
+The first step is to setup some job parameters in the file **tilesets.py**. There are some examples in there already that should give you an idea of what is needed. Bounds can be found from Google Earth/Maps etc. A provider must be selected. These are defined in **providers.py** and it is easy to add your own or update them as the details change over time.
 
 There are 5 basic command options and all take the format: 
 `python tile.py <tile-set-name> <output-folder> <command-option>`.

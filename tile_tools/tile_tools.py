@@ -9,7 +9,7 @@ from StringIO import StringIO
 from string import Template
 
 import eventlet
-from eventlet.green import urllib2
+from eventlet.green import urllib2 as evUrllib2
 from PIL import Image
 
 
@@ -239,24 +239,24 @@ class TileDownloadJob:
         #     opener = urllib2.build_opener(proxy)
         #     urllib2.install_opener(opener)a
 
-        def fetch(tile):
+        def fetch(tile_to_fetch):
             try:
                 self.counts['attempted'] += 1
-                tile.image = urllib2.urlopen(tile.url(self.tileset.provider)).read()
+                tile_to_fetch.image = evUrllib2.urlopen(tile_to_fetch.url(self.tileset.provider)).read()
                 self.counts['found'] += 1
-            except urllib2.HTTPError as e:
+            except evUrllib2.HTTPError as e:
                 if e.code == 403:
                     self.counts['blocked'] += 1
                 elif e.code == 404:
                     self.counts['not_found'] += 1
                     with open("blank.png", 'rb') as f:
-                        tile.image = f.read()
+                        tile_to_fetch.image = f.read()
                 else:
-                    print e.code
-            except urllib2.URLError as e:
-                print e
+                    print(e.code)
+            except evUrllib2.URLError as e:
+                print(e)
             finally:
-                return tile
+                return tile_to_fetch
 
         self.counts['blocked'] = 0
         self.counts['not_found'] = 0

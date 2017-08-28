@@ -319,6 +319,24 @@ class TileDownloadJob:
         ]
         subprocess.call(args)
 
+    def clean_download(self):
+        args = ["find",
+                os.path.join(self.tiles_dir()),
+                "-type",
+                "f",
+                "-not",
+                "-size",
+                "+1k",
+                "-name",
+                "*.png"]
+        ps = subprocess.Popen(args, stdout=subprocess.PIPE)
+        number_deleted = len(ps.stdout.readlines())
+        ps.wait()
+        args.append("-delete")
+        subprocess.Popen(args, stdout=subprocess.PIPE)
+        ps.wait()
+        print "Deleted files: {}".format(number_deleted)
+
 
 class TileStitchJob:
 

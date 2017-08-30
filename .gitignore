@@ -91,4 +91,5 @@ ENV/
 .ropeproject
 .idea/
 scripts/password
-src/connections.py
+src/connections_local.py
+src/tilesets_local.py

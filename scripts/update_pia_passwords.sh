@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#Needs a file called 'password' with your password in the same folder
 PIA_PASSWORD=`cat password`
 FILES=/etc/NetworkManager/system-connections/PIA*
 

@@ -90,4 +90,5 @@ ENV/
 # Rope project settings
 .ropeproject
 .idea/
-/lib/
+scripts/password
+src/connections.py

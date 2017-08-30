@@ -13,6 +13,7 @@ import errno
 from StringIO import StringIO
 from string import Template
 
+from datetime import datetime
 import eventlet
 from eventlet.green import urllib2 as evUrllib2
 from PIL import Image
@@ -209,12 +210,28 @@ class TileDownloadJob:
     def __init__(self, out_path, tileset):
 
         self.counts = dict()
+        self.set_counts()
         self.out_path = out_path
         self.job_name = tileset.folder
         self.tileset = tileset
+        self.connections = None
+        self.connection_name = None
         self.downloads = list()
         self.exists = list()
         self.gen_download_lists()
+        self.start_time = datetime.now()
+
+    def gen_lists(self):
+        self.downloads = list()
+        self.exists = list()
+        self.gen_download_lists()
+
+    def set_counts(self):
+        self.counts['blocked'] = 0
+        self.counts['not_found'] = 0
+        self.counts['found'] = 0
+        self.counts['attempted'] = 0
+        self.counts['connection'] = 0
 
     def gen_download_lists(self):
 
@@ -233,7 +250,7 @@ class TileDownloadJob:
         self.counts["download"] = len(self.downloads)
         self.counts["exists"] = len(self.exists)
 
-    def get_tiles(self):
+    def get_tiles(self, proxy=False):
 
         def test_path(filename_to_check):
             if not os.path.exists(os.path.dirname(filename_to_check)):
@@ -246,6 +263,7 @@ class TileDownloadJob:
         def fetch(tile_to_fetch):
             try:
                 self.counts['attempted'] += 1
+                self.counts['connection'] += 1
                 tile_to_fetch.image = evUrllib2.urlopen(tile_to_fetch.url(self.tileset.provider)).read()
                 self.counts['found'] += 1
             except evUrllib2.HTTPError as e:
@@ -262,12 +280,7 @@ class TileDownloadJob:
             finally:
                 return tile_to_fetch
 
-        self.counts['blocked'] = 0
-        self.counts['not_found'] = 0
-        self.counts['found'] = 0
-        self.counts['attempted'] = 0
-
-        pool = eventlet.GreenPool(10)
+        pool = eventlet.GreenPool(25)
         for tile in pool.imap(fetch, self.downloads):
             filename = tile.full_path(self)
             test_path(filename)
@@ -276,14 +289,48 @@ class TileDownloadJob:
                 im.save(filename, "PNG")
                 tile.image = None
                 self.exists.append(tile)
-            output = "Attempted: {0}/{1}   Found: {2}   Not found: {3}   Blocked: {4}".format(
-                                                                        self.counts["attempted"],
-                                                                        self.counts["download"],
-                                                                        self.counts["found"],
-                                                                        self.counts['not_found'],
-                                                                        self.counts['blocked'])
+
+            seconds_elapsed = (datetime.now() - self.start_time).total_seconds()
+            tiles_per_min = int((float(self.counts["attempted"]) / seconds_elapsed) * 60)
+            minutes_remaining = int((self.counts['download'] - self.counts['attempted']) / tiles_per_min)
+
+            output = "Attempted: {0}/{1}   Found: {2}   Not found: {3}   Blocked: {4}    " \
+                     "Tiles/Min: {5}({6} mins remaining)".format(self.counts["attempted"],
+                                                                 self.counts["download"],
+                                                                 self.counts["found"],
+                                                                 self.counts['not_found'],
+                                                                 self.counts['blocked'],
+                                                                 tiles_per_min,
+                                                                 minutes_remaining)
             sys.stdout.write("\r{}".format(output))
             sys.stdout.flush()
+
+            if proxy and (self.counts['blocked'] > 10 or self.counts['connection'] > 100):
+                self.counts['connection'] = 0
+                self.counts['blocked'] = 0
+                self.reset_vpn()
+                self.gen_lists()
+                return False
+
+        return True
+
+    def init_vpn(self, _connections):
+        self.connections = _connections
+        self.connection_name = random.choice(self.connections)
+        self.open_vpn()
+
+    def open_vpn(self):
+        args = ['nmcli', 'con', 'up', 'id', '{}'.format(self.connection_name)]
+        subprocess.call(args, stdout=open(os.devnull, 'wb'))
+
+    def close_vpn(self):
+        args = ['nmcli', 'con', 'down', 'id', '{}'.format(self.connection_name)]
+        subprocess.call(args, stdout=open(os.devnull, 'wb'))
+
+    def reset_vpn(self):
+        self.close_vpn()
+        self.connection_name = random.choice(self.connections)
+        self.open_vpn()
 
     def write_leaflet_viewer(self):
 

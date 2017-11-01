@@ -1,4 +1,4 @@
-## A Python tool to download map tiles and convert them into an offline format compatible with QGIS or ArcMap.
+## A command line tool to download map tiles from web services for use in desktop GIS packages (i.e QGIS or ArcMap).
 
 Created to help teams responding to natural disasters in the Philippines, giving them access to aerial imagery in tools like QGIS during during periods of disruption to internet services.
 

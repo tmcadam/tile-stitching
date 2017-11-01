@@ -24,6 +24,10 @@ For the tool itself no installation is required, just download or clone.
         + Install PIL through OSGEO4W
         + https://www.aubrett.com/article/information-technology/geospatial/gdal/install-osgeo4w
 
+## Running tests
+A far from complete suite of tests can be run using
+  * ```python src/tile_function_tests.py```
+
 ## Usage
 The first step is to setup job parameters in the file **tilesets.py**. There are some examples in there already that should give you an idea of what is needed. Bounds can be found from Google Earth/Maps etc. A provider must be selected. These are defined in **providers.py** and it is easy to add your own or update them, as the details will likely change over time.
 

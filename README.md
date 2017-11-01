@@ -11,7 +11,7 @@ For the tool itself no installation is required, just download or clone.
   + https://github.com/tmcadam/tile-stitching/archive/master.zip
   + ```git clone https://github.com/tmcadam/tile-stitching.git```
 
-##Installing dependencies
+## Installing dependencies
 + Install eventlet (essential) `sudo pip install eventlet`
 + Install mb-util (needed to exported MBTiles format)
     + https://github.com/mapbox/mbutil
@@ -24,7 +24,7 @@ For the tool itself no installation is required, just download or clone.
         + Install PIL through OSGEO4W
         + https://www.aubrett.com/article/information-technology/geospatial/gdal/install-osgeo4w
 
-##Usage
+## Usage
 The first step is to setup job parameters in the file **tilesets.py**. There are some examples in there already that should give you an idea of what is needed. Bounds can be found from Google Earth/Maps etc. A provider must be selected. These are defined in **providers.py** and it is easy to add your own or update them, as the details will likely change over time.
 
 There are 7 commands and all take the format: `python tile.py <tileset-name> <output-directory> <command>`. The tool will create a sub-directory within this folder for each individual job.
@@ -39,15 +39,15 @@ e.g. `python tile.py sample2 "/home/bob/Tiles" download`
 + `mbtiles` Outputs an MBTiles file containing the downloaded tiles to the `<output-directory>`. This is the best option for QGIS users, giving original tile quality and very fast rendering performance at all zoom levels. This command has a dependency on mb-util (see Installing dependencies).
 + `geotiff` Outputs a GeoTiff file to the `<output-directory>`, this is a fairly universal format that works well with QGIS and ArcMap. It is slow to generate and will create a very large temporary PNG during output. It includes overview generation so they should render in GIS with good performance, however there is a small loss in quality due to compression. There is a dependency on PIL and gdal (see Installing dependencies).
 
-##Proxy downloads
+## Proxy downloads
 Using the `proxy_download` command requires some additional setup, and will likely only work on Ubuntu, as it is calling system commands(`nmcli`) to modify network settings. The command randomly picks a proxy/VPN connection from a pool then swaps to another connection after a set number of tiles have been downloaded or blocking occurs. The pool of proxies/VPNs is defined in `connections.py`. These VPN connections must be already set up on the machine running the script and have stored passwords. There is a scripts in the `scripts` folder to help with setting the passwords on multiple VPN connections. A provider such as PIA provides multiple VPN connections for a fee ,or there could also be other free sources.
 
 
-##System resources & tile numbers
+## System resources & tile numbers
 
 The number of tiles can be huge. Size of area and zoom levels will effect the number. Each zoom level has 4 times the number of tiles as the previous so things can get out of hand quickly! Around 100,000 tiles will produce a 3GB+ MBTiles file, which QGIS seems able to cope with and is probably a reasonable figure to start off with. The generation of the GeoTiff will require a lot of system memory(RAM) for large jobs. Use the `count_tiles` tool before starting to download.
 
 
-##Windows Users
+## Windows Users
 
 This hasn't been tested on Windows, but most commands should run if installed in an environment like OSGEO4W. The `clean_downloads` command is dependent on the GNU `find` command so may need CYGWIN to run with Windows. It is checking for PNG files under 1kb in the outputted folder structure, so it may also be possible to do this manually in Windows Explorer.
